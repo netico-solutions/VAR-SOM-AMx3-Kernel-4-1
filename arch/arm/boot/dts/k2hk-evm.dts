@@ -16,6 +16,26 @@
 	compatible =  "ti,k2hk-evm","ti,keystone";
 	model = "Texas Instruments Keystone 2 Kepler/Hawking EVM";
 
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		dsp_common_cma_pool: dsp_common_cma_pool {
+			compatible = "shared-dma-pool";
+			reg = <0x00000008 0x20000000 0x00000000 0x800000>;
+			reusable;
+			status = "okay";
+		};
+
+		dsp_reserved_code_area: dsp_reserved_code_area {
+			compatible = "shared-dma-pool";
+			reg = <0x00000008 0x20800000 0x00000000 0x1F7FFFFF>;
+			no-map;
+			status = "okay";
+		};
+	};
+
 	soc {
 		clocks {
 			refclksys: refclksys {
@@ -179,4 +199,50 @@
 		compatible = "marvell,88E1111", "ethernet-phy-ieee802.3-c22";
 		reg = <1>;
 	};
+};
+
+&dsp0 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp1 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp2 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp3 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp4 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp5 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp6 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&dsp7 {
+	status = "okay";
+	memory-region = <&dsp_common_cma_pool>;
+};
+
+&uio_dspmem {
+	status = "okay";
+	mem  = <0x0c000000 0x000600000
+		0xa0000000 0x20000000>;
 };
