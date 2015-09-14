@@ -155,4 +155,11 @@ config UIO_MF624
 
 	  If you compile this as a module, it will be called uio_mf624.
 
+config UIO_TI_PDRV
+	tristate "uio driver for ti peripheral modules"
+	help
+	  Userspace I/O interface for the generic TI peripherals. Provides
+	  access to peripheral registers and memory areas from user space.
+	  Also ties-inn interrupt and clock features
+
 endif
