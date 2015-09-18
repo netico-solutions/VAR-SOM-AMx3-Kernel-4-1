@@ -164,6 +164,34 @@ static struct device_attribute rpmsg_dev_attrs[] = {
 	__ATTR_NULL
 };
 
+#ifdef CONFIG_KEYSTONE2_DMA_COHERENT
+static inline void
+rpmsg_sync_for_cpu(struct device *dev, void *msg)
+{
+	/* Sync buffer for cpu access */
+	dma_sync_single_for_cpu(dev, virt_to_dma(dev, msg),
+				RPMSG_BUF_SIZE, DMA_TO_DEVICE);
+}
+
+static inline void
+rpmsg_sync_for_device(struct device *dev, void *msg)
+{
+	/* Sync buffer to give access to remote device */
+	dma_sync_single_for_device(dev, virt_to_dma(dev, msg),
+				   RPMSG_BUF_SIZE, DMA_TO_DEVICE);
+}
+#else
+static inline void
+rpmsg_sync_for_cpu(struct device *dev, struct rpmsg_hdr *msg)
+{
+}
+
+static inline void
+rpmsg_sync_for_device(struct device *dev, struct rpmsg_hdr *msg)
+{
+}
+#endif
+
 /* rpmsg devices and drivers are matched using the service name only */
 static inline int rpmsg_id_match(const struct rpmsg_channel *rpdev,
 				  const struct rpmsg_device_id *id)
@@ -810,12 +838,18 @@ int rpmsg_send_offchannel_raw(struct rpmsg_channel *rpdev, u32 src, u32 dst,
 		}
 	}
 
+	/* Sync buffer for cpu access */
+	rpmsg_sync_for_cpu(dev, (void *)(msg));
+
 	msg->len = len;
 	msg->flags = 0;
 	msg->src = src;
 	msg->dst = dst;
 	msg->reserved = 0;
 	memcpy(msg->data, data, len);
+
+	/* Sync buffer to give access to remote device */
+	rpmsg_sync_for_device(dev, (void *)(msg));
 
 	dev_dbg(dev, "TX From 0x%x, To 0x%x, Len %d, Flags %d, Reserved %d\n",
 					msg->src, msg->dst, msg->len,
@@ -872,6 +906,9 @@ static int rpmsg_recv_single(struct virtproc_info *vrp, struct device *dev,
 	struct scatterlist sg;
 	int err;
 
+	/* Sync buffer to receive message */
+	rpmsg_sync_for_cpu(dev, (void *)(msg));
+
 	dev_dbg(dev, "From: 0x%x, To: 0x%x, Len: %d, Flags: %d, Reserved: %d\n",
 					msg->src, msg->dst, msg->len,
 					msg->flags, msg->reserved);
@@ -918,6 +955,9 @@ static int rpmsg_recv_single(struct virtproc_info *vrp, struct device *dev,
 
 	/* publish the real size of the buffer */
 	sg_init_one(&sg, msg, RPMSG_BUF_SIZE);
+
+	/* Sync buffer for remote device to use */
+	rpmsg_sync_for_device(dev, (void *)(msg));
 
 	/* add the buffer back to the remote processor's virtqueue */
 	err = virtqueue_add_inbuf(vrp->rvq, &sg, 1, msg, GFP_KERNEL);
@@ -1100,6 +1140,9 @@ static int rpmsg_probe(struct virtio_device *vdev)
 		void *cpu_addr = vrp->rbufs + i * RPMSG_BUF_SIZE;
 
 		sg_init_one(&sg, cpu_addr, RPMSG_BUF_SIZE);
+
+		/* Sync buffer for remove device to use */
+		rpmsg_sync_for_device(&vdev->dev, (void *)(&sg));
 
 		err = virtqueue_add_inbuf(vrp->rvq, &sg, 1, cpu_addr,
 								GFP_KERNEL);
