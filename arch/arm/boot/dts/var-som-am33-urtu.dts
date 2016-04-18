@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 2015 Variscite LTD - http://www.variscite.com/
+/* * Copyright (C) 2015 Variscite LTD - http://www.variscite.com/
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -75,13 +74,6 @@
 			gpios = <&gpio3 4 GPIO_ACTIVE_LOW>;
 			gpio-key,wakeup;
 		};
-	};
-
-	backlight {
-		compatible = "pwm-backlight";
-		pwms = <&ehrpwm0 0 50000 0>;
-		brightness-levels = <0 58 61 66 75 90 125 170 255>;
-		default-brightness-level = <8>;
 	};
 
 	sound {
@@ -244,6 +236,13 @@
 		>;
 	};
 
+    i2c2_pins: pinmux_i2c2_pins {
+        pinctrl-single,pins = <
+            0x150 (PIN_INPUT_PULLUP | MUX_MODE2)    /* spi0_sclk.i2c2_sda:  COM_I2C_SDA */
+            0x154 (PIN_INPUT_PULLUP | MUX_MODE2)    /* spi0_d0.i2c2_scl:    COM_I2C_SCL */
+        >;
+    };
+
 	uart0_pins: pinmux_uart0_pins {
 		pinctrl-single,pins = <
 			0x170 (PIN_INPUT_PULLUP | MUX_MODE0)	/* uart0_rxd.uart0_rxd */
@@ -266,6 +265,20 @@
 			0x17C (PIN_INPUT_PULLDOWN | MUX_MODE7)
 			0x180 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 			0x184 (PIN_INPUT_PULLDOWN | MUX_MODE7)
+		>;
+	};
+
+	uart4_pins_default: pinmux_uart4_pins_default {
+		pinctrl-single,pins = <
+			0x11c (PIN_INPUT_PULLUP | MUX_MODE3)    /* gmii1_txd3.uart4_rxd: UART4 RX */
+			0x120 (PIN_OUTPUT | MUX_MODE3)		    /* gmii1_txd2.uart4_txd: UART4 TX */
+		>;
+	};
+
+	uart4_pins_sleep: pinmux_uart4_pins_sleep {
+		pinctrl-single,pins = <
+			0x11c (PIN_INPUT_PULLDOWN | MUX_MODE7)
+			0x120 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 		>;
 	};
 
@@ -312,12 +325,6 @@
 			0x94 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 			0x98 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 			0x9c (PIN_INPUT_PULLDOWN | MUX_MODE7)
-		>;
-	};
-
-	ehrpwm0_pins: backlight_pins {
-		pinctrl-single,pins = <
-			0x150 0x3	/* spi0_sclk.ehrpwm0A | MODE 3 */
 		>;
 	};
 
@@ -491,20 +498,6 @@
 		>;
 	};
 
-	/* ctw6120 irq GPIO. */
-	ctw6120_pins: pinmux_ctw6120_pins {
-		pinctrl-single,pins = <
-			0x154 0x27	/* spi0_d0.gpio0_3, INPUT | MODE7 */
-		>;
-	};
-
-	dcan0_default: dcan0_default_pins {
-		pinctrl-single,pins = <
-			0x11c (PIN_OUTPUT_PULLDOWN | MUX_MODE1)	 /* AM33XX_CONTROL_PADCONF_MII1_TXD3_OFFSET			0x091C */
-			0x120 (PIN_INPUT_PULLUP | MUX_MODE1)      /* AM33XX_CONTROL_PADCONF_MII1_TXD2_OFFSET			0x0920 */
-		>;
-	};
-
 	spi1_pins_default: pinmux_spi1_pins_default {
 		pinctrl-single,pins = <
 			0x108 (PIN_INPUT | MUX_MODE2)	/* ECAP0_IN_PWM0_OUT: SPI CLK */
@@ -558,11 +551,9 @@
 };
 
 &uart4 {
-	/*
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&uart4_pins_default>;
 	pinctrl-1 = <&uart4_pins_sleep>;
-	*/
 	status = "okay";
 };
 
@@ -638,15 +629,19 @@
 		DRVDD-supply = <&vaux2_reg>;
 		DVDD-supply = <&vbat>;
 	};
+};
 
-	ctw6120_tsc@38 {
-		compatible = "edt,edt-ft5206";
-		pinctrl-names = "default";
-		pinctrl-0 = <&ctw6120_pins>;
-		reg = <0x38>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <3 IRQ_TYPE_NONE>;
-	};
+&i2c2 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c2_pins>;
+    status = "okay";
+    clock-frequency = <100000>;
+
+    mcp23017: mcp23017@20 {
+        compatible = "microchip,mcp23017";
+        reg = <0x20>;
+        status = "okay";
+    };
 };
 
 &usb {
@@ -680,15 +675,6 @@
 	status = "okay";
 };
 
-&epwmss0 {
-	status = "okay";
-
-	ehrpwm0: ehrpwm@48300200 {
-		status = "okay";
-		pinctrl-names = "default";
-		pinctrl-0 = <&ehrpwm0_pins>;
-	};
-};
 
 &wkup_m3 {
 	ti,scale-data-fw = "am335x-evm-scale-data.bin";
@@ -799,12 +785,6 @@
 };
 
 #include "tps65910.dtsi"
-
-&dcan0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&dcan0_default>;
-	status = "okay";
-};
 
 
 &tps {
