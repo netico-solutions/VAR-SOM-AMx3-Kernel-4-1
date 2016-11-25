@@ -330,7 +330,7 @@
 
 	cpsw_default: cpsw_default {
 		pinctrl-single,pins = <
-			/* Slave 1 */
+		/* Slave 1 */
 		0x10c (PIN_INPUT_PULLDOWN | MUX_MODE1)     /* mii1_crs.rmii1_crs_dv */
 		0x110 (PIN_INPUT_PULLDOWN | MUX_MODE1)     /* mii1_rxerr.rmii1_rxerr */
 		0x114 (PIN_OUTPUT | MUX_MODE1)             /* mii1_txen.rmii1_txen */
@@ -342,8 +342,6 @@
 		0x138 (PIN_INPUT_PULLUP | MUX_MODE7)       /* mii1_rxd2.gpio2_19 */
 
 		/* Slave 2 */
-        /* Not used */
-#if 0
 		0x40 (PIN_OUTPUT | MUX_MODE2)	           /* gpmc_a0.rgmii2_tctl */
 		0x44 (PIN_INPUT_PULLDOWN | MUX_MODE2)	   /* gpmc_a1.rgmii2_rctl */
 		0x48 (PIN_OUTPUT | MUX_MODE2)	           /* gpmc_a2.rgmii2_td3 */
@@ -356,9 +354,11 @@
 		0x64 (PIN_INPUT_PULLDOWN | MUX_MODE2)      /* gpmc_a9.rgmii2_rd2 */
 		0x68 (PIN_INPUT_PULLDOWN | MUX_MODE2)      /* gpmc_a10.rgmii2_rd1 */
 		0x6c (PIN_INPUT_PULLDOWN | MUX_MODE2)      /* gpmc_a11.rgmii2_rd0 */
+#if 0
+        /* Refclk is not being used by this hardware */
 		0x108 (PIN_INPUT_PULLDOWN | MUX_MODE1)     /* mii1_col.rmii2_refclk */
-		0x130 (PIN_INPUT_PULLUP | MUX_MODE7)       /* mii1_rxclk.gpio3_10 */
 #endif
+		0x130 (PIN_INPUT_PULLUP | MUX_MODE7)       /* mii1_rxclk.gpio3_10 */
 		>;
 	};
 
@@ -376,8 +376,6 @@
 		0x138 (PIN_INPUT_PULLUP | MUX_MODE7)       /* mii1_rxd2.gpio2_19 */
 
 		/* Slave 2 reset value */
-        /* Not used */
-#if 0
 		0x40 (PIN_INPUT_PULLDOWN | MUX_MODE7) 
 		0x44 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 		0x48 (PIN_INPUT_PULLDOWN | MUX_MODE7)
@@ -390,7 +388,6 @@
 		0x64 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 		0x68 (PIN_INPUT_PULLDOWN | MUX_MODE7)
 		0x6c (PIN_INPUT_PULLDOWN | MUX_MODE7)
-#endif
 		>;
 	};
 
