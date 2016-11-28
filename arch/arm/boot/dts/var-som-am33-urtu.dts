@@ -907,10 +907,14 @@
 	dual_emac_res_vlan = <2>;
 };
 
-
+#if 0
+/* This hardware is not using external RGMII2 clock, so omit this value to use
+ * the internal clock
+ */
 &phy_sel {
 	rmii-clock-ext;
 };
+#endif
 
 &mmc1 {
 	status = "okay";
