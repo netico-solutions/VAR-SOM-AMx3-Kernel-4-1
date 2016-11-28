@@ -886,13 +886,10 @@
 		reg = <1>;
 		micrel,reset-regs;
 	};
-    /* Not used */
-#if 0
 	phy7: phy@17 {
 		reg = <7>;
 		micrel,reset-regs;
 	};
-#endif
 };
 
 &cpsw_emac0 {
