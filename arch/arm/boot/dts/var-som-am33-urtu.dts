@@ -224,8 +224,8 @@
 
 	i2c0_pins: pinmux_i2c0_pins {
 		pinctrl-single,pins = <
-			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_sda.i2c0_sda */
-			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_scl.i2c0_scl */
+			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_sda.i2c0_sda    MCP_I2C_SDA*/
+			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_scl.i2c0_scl    MCP_I2C_SCL*/
 		>;
 	};
 
@@ -571,7 +571,13 @@
 	pinctrl-0 = <&i2c0_pins>;
 
 	status = "okay";
-	clock-frequency = <400000>;
+	clock-frequency = <100000>;
+    
+    mcp23017: mcp23017@20 {
+        compatible = "microchip,mcp23017";
+        reg = <0x20>;
+        status = "okay";
+    };
 
 };
 
@@ -637,11 +643,6 @@
     status = "okay";
     clock-frequency = <100000>;
 
-    mcp23017: mcp23017@20 {
-        compatible = "microchip,mcp23017";
-        reg = <0x20>;
-        status = "okay";
-    };
 };
 
 &usb {
