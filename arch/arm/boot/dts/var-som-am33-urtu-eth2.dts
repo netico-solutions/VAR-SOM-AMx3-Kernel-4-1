@@ -568,7 +568,13 @@
 	pinctrl-0 = <&i2c0_pins>;
 
 	status = "okay";
-	clock-frequency = <400000>;
+	clock-frequency = <100000>;
+    
+    mcp23017: mcp23017@20 {
+        compatible = "microchip,mcp23017";
+        reg = <0x20>;
+        status = "okay";
+    };
 
 };
 
@@ -634,11 +640,6 @@
     status = "okay";
     clock-frequency = <100000>;
 
-    mcp23017: mcp23017@20 {
-        compatible = "microchip,mcp23017";
-        reg = <0x20>;
-        status = "okay";
-    };
 };
 
 &usb {
